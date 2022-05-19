@@ -13,7 +13,6 @@ bot.start((ctx) => {
     ctx.reply(await db.getAnswer('onStart'))
 
     const reply = await db.createUser(ctx.from.id)
-    console.log(await db.getAnswer('onLogin'))
     const answer = await db.getAnswer('onLogin')
     ctx.reply(answer.toString().replace('{username}', ctx.from.username).replace('{carma}', reply['user'].carma))
   })()
@@ -21,11 +20,13 @@ bot.start((ctx) => {
 
 bot.help((ctx) => {
   (async function() {
-    const answer = await db.getAnswer('onHelp')
-    for (let command in bot.commands)
-    {
-      console.log(command)
+    let answer = await db.getAnswer('onHelp')
+    answer = answer.toString()
+    answer += '\n'
+    for (let command of await bot.telegram.getMyCommands()) {
+      answer += (command['command'] + ' - ' + command['description'] + '\n')
     }
+    ctx.reply(answer)
   })()
 })
 
