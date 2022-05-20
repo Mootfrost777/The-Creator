@@ -1,9 +1,9 @@
 class User {
-    user_id
+    id
     carma
 
-    constructor(user_id, carma) {
-        this.user_id = user_id;
+    constructor(id, carma) {
+        this.id = id;
         this.carma = carma;
     }
 }

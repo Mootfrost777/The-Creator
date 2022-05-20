@@ -1,10 +1,10 @@
-const {Markup} = require("telegraf");
+const { Markup } = require("telegraf");
 
 async function getDefaultFeedKeyboard() {
     return Markup.keyboard([
         ['Дальше', 'Назад'],
         ['Выйти', 'Сотировка']
-    ])
+    ]).oneTime().resize()
 }
 
 async function getWebAppFeedKeyboard() {
@@ -12,19 +12,18 @@ async function getWebAppFeedKeyboard() {
         ['Открыть в браузере'],
         ['Дальше', 'Назад'],
         ['Выйти', 'Сотировка']
-    ])
+    ]).oneTime().resize()
 }
 
 async function getRandomKeyboard() {
     return Markup.keyboard([
-        ['Дальше', 'Назад'],
-        ['Выйти']
-    ])
+        ['Нет', 'Да']
+    ]).oneTime().resize()
 }
 
 async function getPostInline() {
     return Markup.inlineKeyboard([
-        [Markup.callbackButton('нравится', 'like'), Markup.callbackButton('комментировать', 'comment')]
+        [Markup.button.callback('❤️', 'like'), Markup.button.callback('💬', 'comment')]
     ]).oneTime().resize()
 }
 
@@ -44,7 +43,7 @@ async function getSortKeyboard() {
     return Markup.keyboard([
         ['По дате', 'По популярности'],
         ['Вернуться к ленте']
-    ])
+    ]).oneTime().resize()
 }
 
 module.exports = {

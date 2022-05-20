@@ -3,13 +3,7 @@ const config = require('config');
 const User = require('../models/user');
 const Post = require('../models/post');
 
-const client = new Client({
-  user: config.get('db.user'),
-  host: config.get('db.host'),
-  database: config.get('db.database'),
-  password: config.get('db.password'),
-  port: config.get('db.port')
-})
+const client = new Client(config.get('db'))
 client.connect()
 
 async function createDB() {
@@ -65,29 +59,31 @@ async function createDB() {
   `)
 }
 
-async function createUser(id) {
+async function createUser(user) {
+  console.log(user.id)
   const result = await client.query(`
   SELECT * FROM users WHERE id = $1;
-  `, [id])
+  `, [user.id])
 
   if (result.rowCount > 0) {
-    return getUser(id)
+    console.log('User already exists')
+    return getUser(user.id)
   }
 
   await client.query(`
     INSERT INTO users (id, carma)
     VALUES ($1, $2)
     RETURNING *
-  `, [id, 0])
-  return getUser(id)
+  `, [user.id, user.carma])
+  return getUser(user.id)
 }
 
-async function createPost(title, content, user_id, likes, type) {
+async function createPost(post) {
   await client.query(`
     INSERT INTO posts (title, content, user_id, likes, type)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *
-  `, [title, content, user_id, likes, type])
+  `, [post.title, post.text, post.user_id, post.likes, post.type])
 }
 
 async function editPost(id, title, content) {
@@ -132,13 +128,16 @@ async function getPost(id) {
     SELECT * FROM posts
     WHERE id = $1
   `, [id])
+  console.log(rows)
   if (rows.length === 0) {
     return {
-      error: 'Post does not exist'
+      status: 404,
+      message: 'Post does not exist'
     }
   }
   return {
-    post: rows[0]
+    status: 200,
+    post: new Post(rows[0]['title'], rows[0]['content'], rows[0]['user_id'], rows[0]['likes'], rows[0]['created_at'], rows[0]['type'])
   }
 }
 
@@ -148,6 +147,17 @@ async function getAllPosts() {
   `)
   return {
     posts: rows
+  }
+}
+
+async function getRandomPost() {
+  const { rows } = await client.query(`
+    SELECT * FROM posts
+    ORDER BY RANDOM()
+    LIMIT 1
+  `)
+  return {
+    post: new Post(rows[0]['title'], rows[0]['content'], rows[0]['user_id'], rows[0]['likes'], rows[0]['created_at'], rows[0]['type'])
   }
 }
 
@@ -201,5 +211,6 @@ module.exports = {
   getComments,
   getAnswer,
   addAnswer,
-  endConnection
+  endConnection,
+  getRandomPost
 }
