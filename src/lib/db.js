@@ -1,6 +1,7 @@
 const { Client } = require('pg')
 const config = require('config');
-let User = require('./user');
+const User = require('../models/user');
+const Post = require('../models/post');
 
 const client = new Client({
   user: config.get('db.user'),
@@ -14,8 +15,7 @@ client.connect()
 async function createDB() {
   await client.query(`
     CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      user_id VARCHAR NOT NULL,
+      id INTEGER NOT NULL UNIQUE,
       carma INTEGER NOT NULL,
       created_at TIMESTAMP DEFAULT NOW()
     );
@@ -27,7 +27,9 @@ async function createDB() {
       title VARCHAR NOT NULL,
       content TEXT NOT NULL,
       user_id INTEGER NOT NULL,
+      likes INTEGER NOT NULL DEFAULT 0,
       created_at TIMESTAMP DEFAULT NOW(),
+      type VARCHAR NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users (id)
     );
   `)
@@ -63,29 +65,29 @@ async function createDB() {
   `)
 }
 
-async function createUser(user_id) {
+async function createUser(id) {
   const result = await client.query(`
-  SELECT * FROM users WHERE user_id = $1;
-  `, [user_id])
+  SELECT * FROM users WHERE id = $1;
+  `, [id])
 
   if (result.rowCount > 0) {
-    return getUser(user_id)
+    return getUser(id)
   }
 
   await client.query(`
-    INSERT INTO users (user_id, carma)
+    INSERT INTO users (id, carma)
     VALUES ($1, $2)
     RETURNING *
-  `, [user_id, 0])
-  return getUser(user_id)
+  `, [id, 0])
+  return getUser(id)
 }
 
-async function createPost(title, content, user_id) {
+async function createPost(title, content, user_id, likes, type) {
   await client.query(`
-    INSERT INTO posts (title, content, user_id)
-    VALUES ($1, $2, $3)
+    INSERT INTO posts (title, content, user_id, likes, type)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *
-  `, [title, content, user_id])
+  `, [title, content, user_id, likes, type])
 }
 
 async function editPost(id, title, content) {
@@ -108,15 +110,15 @@ async function editPost(id, title, content) {
   `, [title, content, id])
 }
 
-async function getUser(user_id) {
+async function getUser(id) {
   const rows = await client.query(`
     SELECT * FROM users
-    WHERE user_id = $1
-  `, [user_id])
+    WHERE id = $1
+  `, [id])
   if (rows.length !== 0) {
     return {
       status: 200,
-      user: new User(rows.rows[0]['user_id'], rows.rows[0]['carma'])
+      user: new User(rows.rows[0]['id'], rows.rows[0]['carma'])
     }
   }
   return {

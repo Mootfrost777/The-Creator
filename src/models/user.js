@@ -7,4 +7,5 @@ class User {
         this.carma = carma;
     }
 }
+
 module.exports = User;
