@@ -2,6 +2,7 @@ const { Client } = require('pg')
 const config = require('config');
 const User = require('../models/user');
 const Post = require('../models/post');
+const Comment = require('../models/comment');
 
 const client = new Client(config.get('db'))
 client.connect()
@@ -21,7 +22,6 @@ async function createDB() {
       title VARCHAR NOT NULL,
       content TEXT NOT NULL,
       user_id INTEGER NOT NULL,
-      likes INTEGER NOT NULL DEFAULT 0,
       created_at TIMESTAMP DEFAULT NOW(),
       type VARCHAR NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users (id)
@@ -50,6 +50,7 @@ async function createDB() {
       FOREIGN KEY (post_id) REFERENCES posts (id)
     );
   `)
+
   await client.query(`
   CREATE TABLE IF NOT EXISTS bot_answers (
     id SERIAL PRIMARY KEY,
@@ -137,7 +138,7 @@ async function getPost(id) {
   }
   return {
     status: 200,
-    post: new Post(rows[0]['title'], rows[0]['content'], rows[0]['user_id'], rows[0]['likes'], rows[0]['created_at'], rows[0]['type'])
+    post: new Post(rows[0]['id'], rows[0]['title'], rows[0]['content'], rows[0]['user_id'], rows[0]['likes'], rows[0]['created_at'], rows[0]['type'])
   }
 }
 
@@ -157,7 +158,7 @@ async function getRandomPost() {
     LIMIT 1
   `)
   return {
-    post: new Post(rows[0]['title'], rows[0]['content'], rows[0]['user_id'], rows[0]['likes'], rows[0]['created_at'], rows[0]['type'])
+    post: new Post(rows[0]['id'], rows[0]['title'], rows[0]['content'], rows[0]['user_id'], rows[0]['likes'], rows[0]['created_at'], rows[0]['type'])
   }
 }
 
@@ -167,6 +168,46 @@ async function addComment(content, user_id, post_id) {
     VALUES ($1, $2, $3)
     RETURNING *
   `, [content, user_id, post_id])
+}
+
+async function deleteComment(id) {
+  await client.query(`
+    DELETE FROM comments
+    WHERE id = $1
+  `, [id])
+}
+
+async function getAllComments(post_id) {
+  const { rows } = await client.query(`
+    SELECT * FROM comments
+    WHERE post_id = $1
+  `, [post_id])
+
+  if (rows.length === 0) {
+    return {
+      status: 404,
+      message: 'No comments found'
+    }
+  }
+  let comments = []
+
+  for (let i = 0; i < rows.length; i++) {
+    comments.push(new Comment(rows[i]['id'], rows[i]['content'], rows[i]['user_id'], rows[i]['post_id'], rows[i]['created_at']))
+  }
+  return {
+    status: 200,
+    comments: comments
+  }
+}
+
+async function getCommentsCount(post_id) {
+  const { rows } = await client.query(`
+    SELECT COUNT(*) FROM comments
+    WHERE post_id = $1
+  `, [post_id])
+  return {
+    count: rows[0].count
+  }
 }
 
 async function getComments(post_id) {
@@ -199,6 +240,56 @@ async function endConnection() {
   await client.end()
 }
 
+async function likePost(post_id, user_id) {
+  const { rows } = await client.query(`
+    SELECT * FROM posts
+    WHERE id = $1
+  `, [post_id])
+  if (rows.length === 0) {
+    return {
+      status: 404,
+      message: 'Post not found'
+    }
+  }
+
+  let resp = await client.query(`
+    SELECT * FROM likes
+    WHERE post_id = $1 AND user_id = $2
+  `, [post_id, user_id])
+
+  if (resp.rowCount === 0) {
+    await client.query(`
+      INSERT INTO likes (post_id, user_id)
+      VALUES ($1, $2)
+    `, [post_id, user_id])
+
+    return {
+      status: 200,
+      likes: getLikesCount(post_id)
+    }
+  }
+  else {
+    await client.query(`
+      DELETE FROM likes
+      WHERE post_id = $1 AND user_id = $2
+    `, [post_id, user_id])
+
+    return {
+      status: 200,
+      likes: getLikesCount(post_id)
+    }
+  }
+
+}
+
+async function getLikesCount(post_id) {
+  const { rows } = await client.query(`
+  SELECT COUNT(*) FROM likes
+  WHERE post_id = $1
+  `, [post_id])
+  return rows[0].count
+}
+
 module.exports = {
   createDB,
   createUser,
@@ -208,9 +299,12 @@ module.exports = {
   editPost,
   getAllPosts,
   addComment,
-  getComments,
   getAnswer,
   addAnswer,
   endConnection,
-  getRandomPost
+  getRandomPost,
+  likePost,
+  getLikesCount,
+  getAllComments,
+  getCommentsCount,
 }

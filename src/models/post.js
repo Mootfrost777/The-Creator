@@ -1,4 +1,5 @@
 class Post {
+    id
     title
     text
     user_id
@@ -6,7 +7,8 @@ class Post {
     type
     created_at
 
-    constructor(title, text, user_id, likes, created_at, type) {
+    constructor(id, title, text, user_id, likes, created_at, type) {
+        this.id = id
         this.title = title
         this.text = text
         this.user_id = user_id

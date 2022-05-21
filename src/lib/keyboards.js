@@ -21,15 +21,46 @@ async function getRandomKeyboard() {
     ]).oneTime().resize()
 }
 
-async function getPostInline() {
+
+
+async function getPostInline(likes_count, comments_count) {
     return Markup.inlineKeyboard([
-        [Markup.button.callback('❤️', 'like'), Markup.button.callback('💬', 'comment')]
+        Markup.button.callback(`❤ ${likes_count}`, 'like'), Markup.button.callback(`💬 ${comments_count}`, 'comment')
     ]).oneTime().resize()
 }
 
 async function getCreatePostKeyboard(link) {
     return Markup.keyboard([
         [Markup.button.webApp('Создать в редакторе', link), 'Создать здесь']
+    ]).oneTime().resize()
+}
+
+async function commentSelect() {
+    return Markup.keyboard([
+        ['Выйти', 'Посмотреть все', 'Написать']
+    ]).oneTime().resize()
+}
+
+async function commentIn() {
+    return Markup.keyboard([
+        ['Назад']
+    ]).oneTime().resize()
+}
+
+async function commentListInline(page, max_page) {
+    if (page === 1) {
+        return Markup.inlineKeyboard([
+            Markup.button.callback('Вперед', 'next')
+        ]).oneTime().resize()
+    }
+    if (page === max_page) {
+        return Markup.inlineKeyboard([
+            Markup.button.callback('Назад', 'prev')
+        ]).oneTime().resize()
+    }
+    return Markup.inlineKeyboard([
+        Markup.button.callback('Назад', 'prev'),
+        Markup.button.callback('Вперед', 'next')
     ]).oneTime().resize()
 }
 
@@ -53,5 +84,8 @@ module.exports = {
     getApplyKeyboard,
     getSortKeyboard,
     getRandomKeyboard,
-    getPostInline
+    getPostInline,
+    commentSelect,
+    commentIn,
+    commentListInline
 }

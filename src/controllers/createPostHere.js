@@ -5,7 +5,7 @@ const keyboard = require('../lib/keyboards')
 
 const createPostHere = new Scenes.WizardScene('createPostHere',
     async (ctx) => {
-        ctx.wizard.state.post = {}
+
         await ctx.reply('Введите название поста')
         ctx.wizard.next()
     },
@@ -25,7 +25,7 @@ const createPostHere = new Scenes.WizardScene('createPostHere',
     async (ctx) => {
         switch (ctx.message.text) {
             case 'Опубликовать':
-                await db.createPost(new Post(ctx.wizard.state.post.title, ctx.wizard.state.post.text, ctx.from.id, 0, 0, 'chat'))
+                await db.createPost(new Post(0, ctx.wizard.state.post.title, ctx.wizard.state.post.text, ctx.from.id, 0, 0, 'chat'))
                 await ctx.reply('Пост успешно опубликован!')
                 await ctx.scene.leave()
                 break
@@ -36,5 +36,6 @@ const createPostHere = new Scenes.WizardScene('createPostHere',
         }
     }
 )
+
 
 module.exports = createPostHere
