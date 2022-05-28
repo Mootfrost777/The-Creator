@@ -12,8 +12,10 @@ const randomPost = new Scenes.WizardScene('randomPost',
         let reply  = `${post['post'].title}\n\n`
         reply += `${post['post'].text}`
 
-        await ctx.reply(reply, await keyboard.getPostInline(await db.getLikesCount(post['post'].id), await db.getCommentsCount(post['post'].id)))
-        //await ctx.reply('Продолжить?', await keyboard.getRandomKeyboard())
+        console.log('Comments: ' + await db.getCommentsCount(ctx.wizard.state.post.id))
+        await ctx.reply(reply, await keyboard.getPostInline(await db.getLikesCount(post['post'].id), await db.getCommentsCount(ctx.wizard.state.post.id)))
+
+        await ctx.reply('Продолжить?', await keyboard.getRandomKeyboard())
         ctx.wizard.next()
     }
   },
@@ -36,7 +38,7 @@ randomPost.action('like', async (ctx) => {
     const resp = await db.likePost(ctx.wizard.state.post.id, ctx.from.id)
     if (resp['status'] === 200) {
         try {
-            await ctx.editMessageReplyMarkup(JSON.parse(JSON.stringify(await keyboard.getPostInline(await db.getLikesCount(ctx.wizard.state.post.id), db.getCommentsCount(ctx.wizard.state.post.id))))['reply_markup'])
+            await ctx.editMessageReplyMarkup(JSON.parse(JSON.stringify(await keyboard.getPostInline(await db.getLikesCount(ctx.wizard.state.post.id), await db.getCommentsCount(ctx.wizard.state.post.id))))['reply_markup'])
             //await ctx.editMessageReplyMarkup(ctx.chat_id, ctx.message_id, await keyboard.getPostInline(await db.getLikesCount(ctx.wizard.state.post.id), 1))
             // Я хз что тут делать, функция с перегрузкой с message_id тупа удаляет маркап как бы я его не передавал. Шайтан-машина. Так что костыли с try-catch.
         }
@@ -48,6 +50,6 @@ randomPost.action('like', async (ctx) => {
     else console.log('ERR')
 })
 
-randomPost.action('comment', async (ctx) => ctx.scene.enter('comment'))
+randomPost.action('comment', async (ctx) => ctx.scene.enter('comment', { post_id: ctx.wizard.state.post.id }))
 
 module.exports = randomPost

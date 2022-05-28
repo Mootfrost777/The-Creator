@@ -1,4 +1,5 @@
 const { Markup } = require("telegraf");
+const {max} = require("pg/lib/defaults");
 
 async function getDefaultFeedKeyboard() {
     return Markup.keyboard([
@@ -58,10 +59,17 @@ async function commentListInline(page, max_page) {
             Markup.button.callback('Назад', 'prev')
         ]).oneTime().resize()
     }
+    if (max_page === 1 || max_page === 0) {
+        return
+    }
     return Markup.inlineKeyboard([
         Markup.button.callback('Назад', 'prev'),
         Markup.button.callback('Вперед', 'next')
     ]).oneTime().resize()
+}
+
+async function clearMarkup() {
+    return Markup.removeKeyboard()
 }
 
 async function getApplyKeyboard() {
@@ -87,5 +95,6 @@ module.exports = {
     getPostInline,
     commentSelect,
     commentIn,
-    commentListInline
+    commentListInline,
+    clearMarkup
 }

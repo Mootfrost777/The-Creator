@@ -205,9 +205,7 @@ async function getCommentsCount(post_id) {
     SELECT COUNT(*) FROM comments
     WHERE post_id = $1
   `, [post_id])
-  return {
-    count: rows[0].count
-  }
+  return rows[0].count
 }
 
 async function getComments(post_id) {
