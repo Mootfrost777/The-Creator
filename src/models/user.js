@@ -3,9 +3,9 @@ class User {
     carma
 
     constructor(id, carma) {
-        this.id = id;
-        this.carma = carma;
+        this.id = id
+        this.carma = carma
     }
 }
 
-module.exports = User;
+module.exports = User

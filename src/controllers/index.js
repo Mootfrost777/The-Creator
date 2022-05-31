@@ -1,0 +1,6 @@
+exports.comment = require('./comment')
+exports.createPostHere = require('./createPostHere')
+//exports.feed = require('./feed')
+exports.profile = require('./profile')
+exports.profileSettings = require('./profileSettings')
+exports.randomPost = require('./randomPost')

@@ -1,9 +1,33 @@
-const { Scenes } = require('telegraf')
+const { Scenes, Markup} = require('telegraf')
 const db = require('../lib/db')
-const Post = require('../models/post')
-const keyboard = require('../lib/keyboards')
 const config = require('config')
 
+
+async function getCommentListInline(page, max_page) {
+    if (page === 1) {
+        return Markup.inlineKeyboard([
+            Markup.button.callback('Вперед', 'next')
+        ]).oneTime().resize()
+    }
+    if (page === max_page) {
+        return Markup.inlineKeyboard([
+            Markup.button.callback('Назад', 'prev')
+        ]).oneTime().resize()
+    }
+    if (max_page === 1 || max_page === 0) {
+        return
+    }
+    return Markup.inlineKeyboard([
+        Markup.button.callback('Назад', 'prev'),
+        Markup.button.callback('Вперед', 'next')
+    ]).oneTime().resize()
+}
+
+async function getSelectKeybaord() {
+    return Markup.keyboard([
+        ['Выйти', 'Посмотреть все', 'Написать']
+    ]).oneTime().resize()
+}
 
 async function getCommentsPage(ctx) {
     const comments = ctx.wizard.state.comments.comments
@@ -21,10 +45,10 @@ async function getCommentsPage(ctx) {
 async function editCommentsPage(ctx, page) {
     await ctx.editMessageText(page)
     try {
-        await ctx.editMessageReplyMarkup(await keyboard.commentListInline(ctx.wizard.state.comments.page, ctx.wizard.state.comments.comments.length / config.get('interface.commentsPerPage')))
+        await ctx.editMessageReplyMarkup(await getCommentListInline(ctx.wizard.state.comments.page, ctx.wizard.state.comments.comments.length / config.get('interface.commentsPerPage')))
     }
     catch (e) {
-        await ctx.reply('Проблема при изменении страницы, в скором времени будет исправлено.')
+        await ctx.reply('Проблема при изменении страницы, в скором времени будет исправлено(нет).')
     }
 }
 
@@ -32,7 +56,7 @@ const comment = new Scenes.WizardScene('comment',
     async (ctx) => {
         ctx.wizard.state.comments = {}
 
-        await ctx.reply('Выберите действие:', await keyboard.commentSelect())
+        await ctx.reply('Выберите действие:', await getSelectKeybaord())
         ctx.wizard.next()
     },
     async (ctx) => {
@@ -48,7 +72,7 @@ const comment = new Scenes.WizardScene('comment',
                     ctx.wizard.state.comments.comments = comments['comments']
                     ctx.wizard.state.comments.page = 1
 
-                    await ctx.reply(await getCommentsPage(ctx), await keyboard.commentListInline(ctx.wizard.state.comments.page, comments.length / config.get('interface.commentsPerPage')))
+                    await ctx.reply(await getCommentsPage(ctx), await getCommentListInline(ctx.wizard.state.comments.page, comments.length / config.get('interface.commentsPerPage')))
                     await ctx.scene.reenter()
                     break
                 case 'Написать':
@@ -64,8 +88,7 @@ const comment = new Scenes.WizardScene('comment',
     },
     async (ctx) => {
         if (ctx.message != null) {
-            const post = await db.getPost(ctx.wizard.state.post_id)
-            const comment = await db.addComment(ctx.message.text, ctx.from.id, ctx.wizard.state.post_id)
+            await db.addComment(ctx.message.text, ctx.from.id, ctx.wizard.state.post_id)
             await ctx.reply('Комментарий добавлен!')
             await ctx.reply('Вы можете посмотреть его в любое время в вашем профиле или в коментариях к посту.')
             await ctx.scene.reenter()

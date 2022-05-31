@@ -1,7 +1,12 @@
-const { Scenes } = require('telegraf')
+const { Scenes, Markup} = require('telegraf')
 const db = require('../lib/db')
 const Post = require('../models/post')
-const keyboard = require('../lib/keyboards')
+
+async function getSelectActionKeyboard() {
+    return Markup.keyboard([
+        ['Отмена', 'Опубликовать']
+    ]).oneTime().resize()
+}
 
 const createPostHere = new Scenes.WizardScene('createPostHere',
     async (ctx) => {
@@ -19,7 +24,7 @@ const createPostHere = new Scenes.WizardScene('createPostHere',
         let reply = 'Предпросмотр поста: \n'
         reply += `Название: ${ctx.wizard.state.post.title}\n\n`
         reply += `Текст: ${ctx.wizard.state.post.text}`
-        await ctx.reply(reply, await keyboard.getApplyKeyboard())
+        await ctx.reply(reply, await getSelectActionKeyboard())
         ctx.wizard.next()
     },
     async (ctx) => {
@@ -36,6 +41,5 @@ const createPostHere = new Scenes.WizardScene('createPostHere',
         }
     }
 )
-
 
 module.exports = createPostHere

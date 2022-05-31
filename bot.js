@@ -1,8 +1,5 @@
-const { Telegraf, Scenes, session } = require('telegraf');
-const createHere = require('./src/controllers/createPostHere')
-const randomPost = require('./src/controllers/randomPost')
-const comment = require('./src/controllers/comment')
-const keyboard = require('./src/lib/keyboards')
+const { Telegraf, Scenes, session, Markup} = require('telegraf')
+const {comment, createPostHere, profile, profileSettings, randomPost} = require('./src/controllers')
 const User = require('./src/models/user')
 
 const config = require('config');
@@ -10,14 +7,18 @@ const db = require('./src/lib/db')
 
 db.createDB().then(() => console.log('DB initialized'))
 
-
 const bot = new Telegraf(config.get('bot.token'))
 
-const stage = new Scenes.Stage([createHere, randomPost, comment])
+const stage = new Scenes.Stage([comment, createPostHere, profile, profileSettings, randomPost])
 bot.use(Telegraf.log());
 bot.use(session());
 bot.use(stage.middleware());
 
+async function getCreatePostKeyboard(link) {
+  return Markup.keyboard([
+    [Markup.button.webApp('Создать в редакторе', link), 'Создать здесь']
+  ]).oneTime().resize()
+}
 
 bot.hears('Создать здесь', (ctx) => ctx.scene.enter('createPostHere'))
 
@@ -33,12 +34,16 @@ bot.start((ctx) => {
 
   })()
 })
+
 bot.command('add', (ctx) => {
   (async function() {
-    ctx.reply('Выберите:', await keyboard.getCreatePostKeyboard('https://mootfr.ru/'))
+    ctx.reply('Выберите:', await getCreatePostKeyboard('https://mootfrost.ru/'))
   })()
 })
+
 bot.command('random', (ctx) => ctx.scene.enter('randomPost'))
+bot.command('profile', (ctx) => ctx.scene.enter('profile'))
+
 bot.help((ctx) => {
   (async function() {
     let answer = await db.getAnswer('onHelp')
