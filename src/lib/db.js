@@ -193,6 +193,16 @@ class Db {
     }
   }
 
+  static async searchPosts(query) {
+    const { rows } = await client.query(`
+    SELECT * FROM posts
+    WHERE title ILIKE '%${query}%' OR content ILIKE '%${query}%'
+    `)
+    return {
+      posts: rows
+    }
+  }
+
   static async addComment(content, user_id, post_id) {
     await client.query(`
     INSERT INTO comments (content, user_id, post_id)
@@ -272,6 +282,7 @@ class Db {
     RETURNING *
   `, [name, content])
   }
+
   static async getLikesCount(post_id) {
     const { rows } = await client.query(`
   SELECT COUNT(*) FROM likes

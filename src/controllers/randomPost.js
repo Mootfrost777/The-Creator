@@ -1,4 +1,4 @@
-const { Scenes, Markup} = require('telegraf')
+const { Scenes, Markup } = require('telegraf')
 const db = require('../lib/db')
 
 async function getActionKeyboard() {
@@ -17,7 +17,6 @@ const randomPost = new Scenes.WizardScene('randomPost',
   async (ctx) => {
     const post = await db.getRandomPost()
     ctx.wizard.state.post = {}
-    console.log(post['post'].id)
     ctx.wizard.state.post.id = post['post'].id
     if (post['post'].type === 'chat') {
         let reply  = `${post['post'].title}\n\n`

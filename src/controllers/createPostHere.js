@@ -10,7 +10,7 @@ async function getSelectActionKeyboard() {
 
 const createPostHere = new Scenes.WizardScene('createPostHere',
     async (ctx) => {
-
+        ctx.wizard.state.post = {}
         await ctx.reply('Введите название поста')
         ctx.wizard.next()
     },

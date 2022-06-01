@@ -1,0 +1,1 @@
+exports.getPageInline = require('./getPageInline');

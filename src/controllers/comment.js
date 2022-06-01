@@ -1,27 +1,7 @@
-const { Scenes, Markup} = require('telegraf')
+const { Scenes, Markup } = require('telegraf')
+const { getPageInline } = require('./utils')
 const db = require('../lib/db')
 const config = require('config')
-
-
-async function getCommentListInline(page, max_page) {
-    if (page === 1) {
-        return Markup.inlineKeyboard([
-            Markup.button.callback('Вперед', 'next')
-        ]).oneTime().resize()
-    }
-    if (page === max_page) {
-        return Markup.inlineKeyboard([
-            Markup.button.callback('Назад', 'prev')
-        ]).oneTime().resize()
-    }
-    if (max_page === 1 || max_page === 0) {
-        return
-    }
-    return Markup.inlineKeyboard([
-        Markup.button.callback('Назад', 'prev'),
-        Markup.button.callback('Вперед', 'next')
-    ]).oneTime().resize()
-}
 
 async function getSelectKeybaord() {
     return Markup.keyboard([
@@ -45,7 +25,7 @@ async function getCommentsPage(ctx) {
 async function editCommentsPage(ctx, page) {
     await ctx.editMessageText(page)
     try {
-        await ctx.editMessageReplyMarkup(await getCommentListInline(ctx.wizard.state.comments.page, ctx.wizard.state.comments.comments.length / config.get('interface.commentsPerPage')))
+        await ctx.editMessageReplyMarkup(await getPageInline(ctx.wizard.state.comments.page, ctx.wizard.state.comments.comments.length / config.get('interface.elementsPerPage')))
     }
     catch (e) {
         await ctx.reply('Проблема при изменении страницы, в скором времени будет исправлено(нет).')
@@ -71,7 +51,7 @@ const comment = new Scenes.WizardScene('comment',
                     ctx.wizard.state.comments.comments = comments['comments']
                     ctx.wizard.state.comments.page = 1
 
-                    await ctx.reply(await getCommentsPage(ctx), await getCommentListInline(ctx.wizard.state.comments.page, comments.length / config.get('interface.commentsPerPage')))
+                    await ctx.reply(await getCommentsPage(ctx), await getPageInline(ctx.wizard.state.comments.page, comments.length / config.get('interface.elementsPerPage')))
                     await ctx.scene.reenter()
                     break
                 case 'Написать':

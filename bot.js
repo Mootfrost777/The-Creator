@@ -1,5 +1,5 @@
 const { Telegraf, Scenes, session, Markup} = require('telegraf')
-const { comment, createPostHere, profile, profileSettings, randomPost, viewProfile } = require('./src/controllers')
+const { comment, createPostHere, profile, profileSettings, randomPost, viewProfile, search } = require('./src/controllers')
 const User = require('./src/models/user')
 
 const config = require('config');
@@ -9,7 +9,7 @@ db.createDB().then(() => console.log('DB initialized'))
 
 const bot = new Telegraf(config.get('bot.token'))
 
-const stage = new Scenes.Stage([comment, createPostHere, profile, profileSettings, randomPost, viewProfile])
+const stage = new Scenes.Stage([comment, createPostHere, profile, profileSettings, randomPost, viewProfile, search])
 bot.use(Telegraf.log());
 bot.use(session());
 bot.use(stage.middleware());
@@ -61,6 +61,7 @@ bot.command('viewprofile', (ctx) => {
 
     })()
 })
+bot.command('search', (ctx) => ctx.scene.enter('search'))
 
 bot.help((ctx) => {
   (async function() {
