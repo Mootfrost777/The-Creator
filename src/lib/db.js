@@ -86,7 +86,21 @@ class Db {
         SET carma = 0
         WHERE id = $1
     `, [user_id])
-    return Db.getUser(user_id)
+
+    await client.query(`
+        DELETE FROM likes
+        WHERE user_id = $1
+    `, [user_id])
+
+    await client.query(`
+        DELETE FROM comments
+        WHERE user_id = $1
+    `, [user_id])
+
+    await client.query(`
+        DELETE FROM posts
+        WHERE user_id = $1
+    `, [user_id])
   }
 
   static async createPost(post) {
@@ -119,10 +133,9 @@ class Db {
 
   static async getPostsCount(id) {
     const rows = await client.query(`
-      SELECT COUNT(*) FROM posts
-      WHERE user_id = $1
-  `, [id])
-    return rows[0].count
+    SELECT COUNT(*) FROM posts WHERE user_id = $1;
+    `, [id])
+    return rows.rows[0].count
   }
 
   static async getUser(id) {

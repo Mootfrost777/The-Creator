@@ -1,5 +1,12 @@
-const { Scenes } = require('telegraf')
+const { Scenes, Markup } = require('telegraf')
 const db = require('../lib/db')
+
+async function getProfileKeyboard() {
+    return Markup.keyboard([
+        ['Поделиться профилем', 'Настройки'],
+        ['Выйти']
+    ]).oneTime().resize()
+}
 
 const profile = new Scenes.WizardScene('profile',
     async (ctx) => {
@@ -10,9 +17,10 @@ const profile = new Scenes.WizardScene('profile',
         .replace('{username}', ctx.from.username)
         .replace('{carma}', reply['user'].carma)
         .replace('{posts}', await db.getPostsCount(ctx.from.id))
-        .replace('{comments}', await db.getCommentsCountByUser(ctx.from.id)))
-    await ctx.reply('Выберите действие:')
-},
+        .replace('{comments}', await db.getCommentsCountByUser(ctx.from.id))
+    , await getProfileKeyboard())
+    ctx.wizard.next()
+    },
     async (ctx) => {
         if (ctx.message != null) {
             switch (ctx.message.text) {
@@ -25,7 +33,6 @@ const profile = new Scenes.WizardScene('profile',
                 case 'Поделиться профилем':
                     break
             }
-            await ctx.scene.reenter()
         }
     })
 

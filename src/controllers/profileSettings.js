@@ -11,6 +11,7 @@ async function getSettingsKeyboard() {
 const profileSettings = new Scenes.WizardScene('profileSettings',
     async (ctx) => {
     await ctx.reply('Выберите действие:', await getSettingsKeyboard())
+    ctx.wizard.next()
     },
     async (ctx) => {
     if (ctx.message != null) {
@@ -19,7 +20,7 @@ const profileSettings = new Scenes.WizardScene('profileSettings',
                 await ctx.reply('Пока в разработке.')
                 break
             case 'Сбросить аккаунт':
-                await ctx.reply('Введите имя пользователя для подтверждения. Это действие будет невозможно отменить!')
+                await ctx.reply('Введите ваше имя пользователя для подтверждения. Это действие будет невозможно отменить!')
                 await ctx.wizard.next()
                 break
             case 'Выйти':

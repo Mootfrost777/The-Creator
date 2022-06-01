@@ -1,5 +1,5 @@
 const { Telegraf, Scenes, session, Markup} = require('telegraf')
-const {comment, createPostHere, profile, profileSettings, randomPost} = require('./src/controllers')
+const { comment, createPostHere, profile, profileSettings, randomPost, viewProfile } = require('./src/controllers')
 const User = require('./src/models/user')
 
 const config = require('config');
@@ -9,7 +9,7 @@ db.createDB().then(() => console.log('DB initialized'))
 
 const bot = new Telegraf(config.get('bot.token'))
 
-const stage = new Scenes.Stage([comment, createPostHere, profile, profileSettings, randomPost])
+const stage = new Scenes.Stage([comment, createPostHere, profile, profileSettings, randomPost, viewProfile])
 bot.use(Telegraf.log());
 bot.use(session());
 bot.use(stage.middleware());
@@ -25,6 +25,12 @@ bot.hears('Создать здесь', (ctx) => ctx.scene.enter('createPostHere'
 
 bot.start((ctx) => {
   (async function() {
+    let args = ctx.update.message.text.split(' ')
+    if (args > 1) {
+      await ctx.scene.enter('viewProfile', {userId: args[1]})
+      return
+    }
+
     ctx.reply(await db.getAnswer('onStart'))
 
     console.log('\n\n\n\n\n\n' + ctx.from.id + '\n\n\n\n\n\n')
@@ -43,6 +49,18 @@ bot.command('add', (ctx) => {
 
 bot.command('random', (ctx) => ctx.scene.enter('randomPost'))
 bot.command('profile', (ctx) => ctx.scene.enter('profile'))
+bot.command('viewprofile', (ctx) => {
+    (async function() {
+        let args = ctx.update.message.text.split(' ')
+        if (args.length > 1) {
+          await ctx.scene.enter('viewProfile', {userId: args[1]})
+        }
+        else {
+          await ctx.reply('Неверный ввод.')
+        }
+
+    })()
+})
 
 bot.help((ctx) => {
   (async function() {

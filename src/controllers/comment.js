@@ -55,7 +55,6 @@ async function editCommentsPage(ctx, page) {
 const comment = new Scenes.WizardScene('comment',
     async (ctx) => {
         ctx.wizard.state.comments = {}
-
         await ctx.reply('Выберите действие:', await getSelectKeybaord())
         ctx.wizard.next()
     },
