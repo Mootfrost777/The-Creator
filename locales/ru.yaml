@@ -1,0 +1,4 @@
+start:
+  greeting: "Привет! Я бот сообщества TheCreator. По всем вопросам пишите @mootfrost"
+  profileSummary: 'Привет, {{ username }}. Твоя карма на текущий момент: {{ carma }}.'
+  carma: 1
