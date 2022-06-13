@@ -1,4 +1,4 @@
-const {Markup} = require("telegraf");
+const { Markup } = require("telegraf");
 
 async function getPageInline(ctx, page, maxPage) {
     const { i18n } = ctx.scene.state

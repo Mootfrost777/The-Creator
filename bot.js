@@ -41,14 +41,14 @@ bot.start((ctx) => {
       username: ctx.from.username,
       carma: reply['user'].carma,
     })
-    ctx.replyWithHTML(message)
+    await ctx.replyWithHTML(message)
 
   })()
 })
 
 bot.command('add', (ctx) => {
   (async function() {
-    ctx.replyWithHTML(ctx.i18n.t('action.promptAction'), await getCreatePostKeyboard(ctx, 'https://mootfrost.ru/'))
+    await ctx.replyWithHTML(ctx.i18n.t('action.promptAction'), await getCreatePostKeyboard(ctx, 'https://mootfrost.ru/'))
   })()
 })
 
@@ -74,7 +74,7 @@ bot.help((ctx) => {
     for (let command of await bot.telegram.getMyCommands()) {
       commands += (command['command'] + ' - ' + command['description'] + '\n')
     }
-
+    console.log('replied')
     await ctx.replyWithHTML(await ctx.i18n.t('help.commands', {
       commands: commands
     }))

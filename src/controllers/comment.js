@@ -1,5 +1,4 @@
 const { Scenes, Markup } = require('telegraf')
-const { match } = require('telegraf-i18n')
 const { getPageInline } = require('./utils')
 const db = require('../lib/db')
 const config = require('config')

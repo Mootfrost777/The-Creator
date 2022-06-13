@@ -19,7 +19,7 @@ createPost:
   publishSuccess: "Пост успешно опубликован"
 
 profile:
-  summary: "Привет, <b>${username}</b>, твой профиль:\n{{profileStats}}"
+  summary: "Привет, <b>${username}</b>, твой профиль:\nКарма: <b>${carma}</b>.\nНаписано постов: <b>${posts}</b>.\nНаписано коментариев: <b>${comments}</b>."
   resetBtn: "Сбросить аккаунт"
   changeDescriptionBtn: "Изменить описание"
   confirmReset: "Введите ваше имя пользователя для подтверждения. Это действие будет невозможно отменить!"
@@ -35,7 +35,7 @@ comment:
   viewAllBtn: "Посмотреть все"
 
 viewProfile:
-  summary: "Профиль пользователя <b>${username}</b>:\n*profileStats"
+  summary: "Профиль пользователя <b>${username}</b>:\nКарма: <b>${carma}</b>.\nНаписано постов: <b>${posts}</b>.\nНаписано коментариев: <b>${comments}</b>."
   noUserIdProvided: "Не указан идентификатор пользователя"
 
 search:

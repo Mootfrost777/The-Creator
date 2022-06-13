@@ -1,5 +1,4 @@
 const { Scenes, Markup } = require('telegraf')
-const { match } = require('telegraf-i18n')
 const db = require('../lib/db')
 
 async function getActionKeyboard(ctx) {
