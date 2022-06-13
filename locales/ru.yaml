@@ -1,4 +1,69 @@
+profileStats: "Карма: <b>${carma}</b>.\nНаписано постов: <b>${posts}</b>.\nНаписано коментариев: <b>${comments}</b>."
+
+page: "Страница <b>${page}</b> из <b>${pages}</b>:\n${elements}"
+
 start:
-  greeting: "Привет! Я бот сообщества TheCreator. По всем вопросам пишите @mootfrost"
-  profileSummary: 'Привет, {{ username }}. Твоя карма на текущий момент: {{ carma }}.'
-  carma: 1
+  greeting: "Привет! Я бот сообщества <b>TheCreator</b>. По всем вопросам пишите @mootfrost"
+  profileSummary: "Привет, <b>${username}</b>. Твоя карма на текущий момент: <b>${carma}</b>"
+
+help:
+  commands: "<b>Помощь по командам:</b>\n${commands}"
+
+createPost:
+  createHereBtn: "Создать здесь"
+  createWebAppBtn: "Создать в редакторе"
+  publishBtn: "Опубликовать"
+  promptTitle: "Введите заголовок поста"
+  promptText: "Введите текст поста"
+  review: "Проверьте правильность введенных данных:<br/><b>${title}</b>\n\n${text}"
+  publishSuccess: "Пост успешно опубликован"
+
+profile:
+  summary: "Привет, <b>${username}</b>, твой профиль:\n{{profileStats}}"
+  resetBtn: "Сбросить аккаунт"
+  changeDescriptionBtn: "Изменить описание"
+  confirmReset: "Введите ваше имя пользователя для подтверждения. Это действие будет невозможно отменить!"
+  resetSuccess: "Аккаунт успешно сброшен"
+  resetError: "Неверное имя пользователя"
+
+comment:
+  promptText: "Введите текст комментария"
+  commentAddSuccess: "Комментарий успешно добавлен"
+  commentAddError: "Ошибка добавления комментария"
+  commentsGetError: "Ошибка получения комментариев"
+  writeBtn: "Написать"
+  viewAllBtn: "Посмотреть все"
+
+viewProfile:
+  summary: "Профиль пользователя <b>${username}</b>:\n*profileStats"
+  noUserIdProvided: "Не указан идентификатор пользователя"
+
+search:
+  repeatBtn: "Еще раз"
+  promptKeyword: "Введите <b>автора</b> или <b>ключевое слово</b>:"
+  promptPostId: "Введите номер поста или выберите действие:"
+
+button:
+  prev: "Назад"
+  next: "Далее"
+  yes: "Да"
+  no: "Нет"
+  exit: "Выйти"
+  cancel: "Отмена"
+  share: "Поделиться"
+  settings: "Настройки"
+
+action:
+  promptAction: "Выберите действие:"
+  promptContinue: "Продолжить?"
+  cancelled: "Отменено"
+  exit: "Выход..."
+
+error:
+  comingSoon: "Скоро будет"
+  keyboardEdit: "Проблема при изменении страницы, в скором времени будет исправлено(нет)"
+  invalidInput: "Неверный ввод"
+
+
+
+

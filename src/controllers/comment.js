@@ -1,75 +1,87 @@
 const { Scenes, Markup } = require('telegraf')
+const { match } = require('telegraf-i18n')
 const { getPageInline } = require('./utils')
 const db = require('../lib/db')
 const config = require('config')
 
-async function getSelectKeybaord() {
+async function getSelectKeyboard(ctx) {
+    const { i18n } = ctx.scene.state
     return Markup.keyboard([
-        ['Выйти', 'Посмотреть все', 'Написать']
+        [await i18n.t('button.exit'), await i18n.t('comment.viewAllBtn'), await i18n.t('comment.writeBtn')]
     ]).oneTime().resize()
 }
 
 async function getCommentsPage(ctx) {
     const comments = ctx.wizard.state.comments.comments
-    let page = `Страница ${ctx.wizard.state.comments.page}:`
-
+    let elements = ''
     for (let i = (ctx.wizard.state.comments.page - 1) * 10; i < 10 * ctx.wizard.state.comments.page; i++) {
         if (comments[i]) {
-            page += `\n${i}. ${comments[i].content}`
+            elements += `\n${i}. ${comments[i].content}`
         }
         else break
     }
-    return page
+
+    return await ctx.i18n.t('page', {
+        page: ctx.wizard.state.comments.page,
+        pages: comments.length / config.get('interface.elementsPerPage'),
+        elements: elements
+    })
 }
 
 async function editCommentsPage(ctx, page) {
+    const { i18n } = ctx.scene.state
     await ctx.editMessageText(page)
     try {
         await ctx.editMessageReplyMarkup(await getPageInline(ctx.wizard.state.comments.page, ctx.wizard.state.comments.comments.length / config.get('interface.elementsPerPage')))
     }
     catch (e) {
-        await ctx.reply('Проблема при изменении страницы, в скором времени будет исправлено(нет).')
+        await ctx.replyWithHTML(await i18n.t('error.keyboardEdit'))
     }
 }
 
 const comment = new Scenes.WizardScene('comment',
     async (ctx) => {
+        if (ctx.i18n != null) {  // А это, чтобы при scene.reenter() ничего не ломалось
+            ctx.scene.state.i18n = ctx.i18n  // Иначе не работает, telegraf зарукопопили
+        }
+        const { i18n } = ctx.scene.state
         ctx.wizard.state.comments = {}
-        await ctx.reply('Выберите действие:', await getSelectKeybaord())
+        await ctx.replyWithHTML(await i18n.t('action.promptAction'), await getSelectKeyboard(ctx))
         ctx.wizard.next()
     },
     async (ctx) => {
+        const { i18n } = ctx.scene.state
         if (ctx.message != null) {
             switch (ctx.message.text) {
-                case 'Посмотреть все':
+                case await i18n.t('comment.viewAllBtn'):
                     const comments = await db.getAllComments(ctx.wizard.state.post_id)
                     if (comments['status'] !== 200) {
-                        await ctx.reply('Не удалось получить комментарии')
+                        await ctx.replyWithHTML(await i18n.t('comment.commentsGetError'))
                         return ctx.scene.reenter()
                     }
 
                     ctx.wizard.state.comments.comments = comments['comments']
                     ctx.wizard.state.comments.page = 1
 
-                    await ctx.reply(await getCommentsPage(ctx), await getPageInline(ctx.wizard.state.comments.page, comments.length / config.get('interface.elementsPerPage')))
+                    await ctx.replyWithHTML(await getCommentsPage(ctx), await getPageInline(ctx, ctx.wizard.state.comments.page, comments.length / config.get('interface.elementsPerPage')))
                     await ctx.scene.reenter()
                     break
-                case 'Написать':
-                    await ctx.reply('Введите текст комментария:')
+                case await i18n.t('comment.writeBtn'):
+                    await ctx.replyWithHTML(await i18n.t('comment.promptText'))
                     ctx.wizard.next()
                     break
-                case 'Выйти':
-                    await ctx.reply('Выход...')
+                case await i18n.t('buttons.exit'):
+                    await ctx.replyWithHTML(await i18n.t('action.exit'))
                     await ctx.scene.leave()
                     break
             }
         }
     },
     async (ctx) => {
+        const { i18n } = ctx.scene.state
         if (ctx.message != null) {
             await db.addComment(ctx.message.text, ctx.from.id, ctx.wizard.state.post_id)
-            await ctx.reply('Комментарий добавлен!')
-            await ctx.reply('Вы можете посмотреть его в любое время в вашем профиле или в коментариях к посту.')
+            await ctx.replyWithHTML(await i18n.t('comment.commentAddSuccess'))
             await ctx.scene.reenter()
         }
     })

@@ -1,36 +1,42 @@
 const { Scenes, Markup } = require('telegraf')
 const db = require('../lib/db')
 
-async function getProfileKeyboard() {
+async function getProfileKeyboard(ctx) {
+    const { i18n } = ctx.scene.state
     return Markup.keyboard([
-        ['Поделиться профилем', 'Настройки'],
-        ['Выйти']
+        [await i18n.t('button.share'), await i18n.t('button.settings')],
+        [await i18n.t('button.exit')]
     ]).oneTime().resize()
 }
 
 const profile = new Scenes.WizardScene('profile',
     async (ctx) => {
-    let answer = await db.getAnswer('onProfile')
+    if (ctx.i18n != null) {
+        ctx.scene.state.i18n = ctx.i18n
+    }
+    const { i18n } = ctx.scene.state
     let reply = await db.getUser(ctx.from.id)
-
-    await ctx.reply(answer
-        .replace('{username}', ctx.from.username)
-        .replace('{carma}', reply['user'].carma)
-        .replace('{posts}', await db.getPostsCount(ctx.from.id))
-        .replace('{comments}', await db.getCommentsCountByUser(ctx.from.id))
-    , await getProfileKeyboard())
+    await ctx.replyWithHTML(await i18n.t('profile.summary', {
+        username: ctx.from.username,
+        carma: reply['user'].carma,
+        posts: await db.getPostsCount(ctx.from.id),
+        comments: await db.getCommentsCountByUser(ctx.from.id)
+    }),
+    await getProfileKeyboard(ctx))
     ctx.wizard.next()
     },
     async (ctx) => {
+        const { i18n } = ctx.scene.state
         if (ctx.message != null) {
             switch (ctx.message.text) {
-                case 'Выйти':
+                case await i18n.t('button.exit'):
+                    await i18n.t('action.exit')
                     await ctx.scene.leave()
                     break
-                case 'Настройки':
+                case await i18n.t('button.settings'):
                     await ctx.scene.enter('profileSettings')
                     break
-                case 'Поделиться профилем':
+                case await i18n.t('button.share'):
                     break
             }
         }
