@@ -40,7 +40,7 @@ viewProfile:
 
 search:
   repeatBtn: "Еще раз"
-  promptKeyword: "Введите <b>автора</b> или <b>ключевое слово</b>:"
+  promptKeyword: "Введите <b>ключевое слово</b>:"
   promptPostId: "Введите номер поста или выберите действие:"
 
 button:

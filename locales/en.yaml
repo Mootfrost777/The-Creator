@@ -1,0 +1,69 @@
+profileStats: "Karma: <b>${carma}</b>.\nPosts written: <b>${posts}</b>.\nComments written: <b>${comments}</b>."
+
+page: "Page <b>${page}</b> of <b>${pages}</b>:\n${elements}"
+
+start:
+  greeting: "Hi! I am a <b>TheCreator</b> community bot. For all questions, write to @mootfrost"
+  profileSummary: "Hello, <b>${username}</b>. Your karma at the moment: <b>${carma}</b>"
+
+help:
+  commands: "<b>Help with commands:</b>\n${commands}"
+
+createPost:
+  createHereBtn: "Create here"
+  createWebAppBtn: "Create in editor"
+  publishBtn: "Publish"
+  promptTitle: "Enter the title of the post"
+  promptText: "Enter the text of the post"
+  review: "Check the data for correctness:<br/><b>${title}</b>\n\n${text}"
+  publishSuccess: "The post was successfully published"
+
+profile:
+  summary: "Hello, <b>${username}</b>, your profile:\nKarma: <b>${carma}</b>.\nPosts written: <b>${posts}</b>.\nComments written: <b>${comments}</b>."
+  resetBtn: "Reset your account"
+  changeDescriptionBtn: "Change the description"
+  confirmReset: "Enter your username to confirm. This action will be impossible to undo!"
+  resetSuccess: "Account successfully reset"
+  resetError: "Invalid username"
+
+comment:
+  promptText: "Enter the comment text"
+  commentAddSuccess: "Comment added successfully"
+  commentAddError: "Error adding a comment"
+  commentsGetError: "Error receiving comments"
+  writeBtn: "Write comment"
+  viewAllBtn: "View all"
+
+viewProfile:
+  summary: "<b>${username}'s</b> profile:\nKarma: <b>${carma}</b>.\nPosts written: <b>${posts}</b>.\nComments written: <b>${comments}</b>."
+  noUserIdProvided: "User ID not specified"
+
+search:
+  repeatBtn: "One more time"
+  promptKeyword: "Enter <b>keyword</b>:"
+  promptPostId: "Enter the post number or select an action:"
+
+button:
+  prev: "Back"
+  next: "Next"
+  yes: "Yes"
+  no: "No"
+  exit: "Leave"
+  cancel: "Cancel"
+  share: "Share"
+  settings: "Settings"
+
+action:
+  promptAction: "Select action:"
+  promptContinue: "Continue?"
+  cancelled: "Cancelled"
+  exit: "Exiting..."
+
+error:
+  comingSoon: "Coming soon"
+  keyboardEdit: "The problem when changing the page, will be fixed soon (no)"
+  invalidInput: "Invalid input"
+
+
+
+

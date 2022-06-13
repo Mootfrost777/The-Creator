@@ -12,7 +12,7 @@ db.createDB().then(() => console.log('DB initialized'))
 const bot = new Telegraf(config.get('bot.token'))
 
 const i18n = new TelegrafI18n({
-    defaultLanguage: 'ru',
+    defaultLanguage: config.get('language'),
     allowMissing: false,
     directory: path.resolve(__dirname, 'locales')
 })
